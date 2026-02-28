@@ -1,0 +1,15 @@
+.container {
+    display: flex;
+    justify-content:center;
+    align-items: center;
+}
+
+.introtext {
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    padding: 50px;
+    color: blue;
+    font-size: 20px;
+
+}
