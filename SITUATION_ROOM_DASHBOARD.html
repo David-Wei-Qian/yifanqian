@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Operations Situation Room - Duke Kunshan University</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066cc;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --dark: #1a202c;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --grid: #f0f4ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Trebuchet MS, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #1a202c;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .situation-room {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0066cc 0%, #003a99 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.3);
+            border-left: 6px solid #ff6b6b;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+        }
+
+        .card.alert {
+            border-left: 4px solid var(--danger);
+            background: #fef2f2;
+        }
+
+        .card.warning {
+            border-left: 4px solid var(--warning);
+            background: #fffbeb;
+        }
+
+        .card.success {
+            border-left: 4px solid var(--success);
+            background: #f0fdf4;
+        }
+
+        .card.critical {
+            border: 2px solid var(--danger);
+            background: white;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+        }
+
+        .card h2 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .metric-detail {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .day-card {
+            text-align: center;
+            padding: 16px 12px;
+            border-radius: 8px;
+            background: var(--light);
+        }
+
+        .day-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .day-sessions {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .day-percent {
+            font-size: 11px;
+            color: #718096;
+        }
+
+        .day-card.peak {
+            background: #fef2f2;
+            border: 2px solid var(--danger);
+        }
+
+        .day-card.peak .day-sessions {
+            color: var(--danger);
+        }
+
+        .day-card.maintenance {
+            background: #f0fdf4;
+            border: 2px solid var(--success);
+        }
+
+        .day-card.maintenance .day-sessions {
+            color: var(--success);
+        }
+
+        .signal-item {
+            padding: 12px;
+            border-left: 3px solid var(--primary);
+            background: var(--grid);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .signal-item strong {
+            color: var(--dark);
+        }
+
+        .signal-item.critical {
+            border-left-color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .signal-item.opportunity {
+            border-left-color: var(--success);
+            background: #f0fdf4;
+        }
+
+        .timeline {
+            position: relative;
+        }
+
+        .timeline-item {
+            padding-left: 32px;
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--primary);
+        }
+
+        .timeline-item.completed::before {
+            background: var(--success);
+            box-shadow: 0 0 0 3px var(--success);
+        }
+
+        .timeline-item.at-risk::before {
+            background: var(--danger);
+            box-shadow: 0 0 0 3px var(--danger);
+        }
+
+        .timeline-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .timeline-description {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .risk-item, .opportunity-item {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .risk-item {
+            background: #fef2f2;
+            border-left: 3px solid var(--danger);
+        }
+
+        .opportunity-item {
+            background: #f0fdf4;
+            border-left: 3px solid var(--success);
+        }
+
+        .risk-title, .opportunity-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .risk-impact, .opportunity-impact {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        .decision-matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .decision-box {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .decision-box strong {
+            display: block;
+            font-size: 13px;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .decision-box p {
+            font-size: 12px;
+            color: #718096;
+            line-height: 1.4;
+        }
+
+        .capacity-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .capacity-fill {
+            height: 100%;
+            background: var(--danger);
+            transition: width 0.3s;
+        }
+
+        .capacity-fill.warning {
+            background: var(--warning);
+        }
+
+        .capacity-fill.good {
+            background: var(--success);
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--border), transparent);
+            margin: 32px 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon {
+            font-size: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .badge.critical {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge.immediate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.next {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric-small {
+            padding: 12px;
+            background: var(--grid);
+            border-radius: 6px;
+        }
+
+        .metric-small .metric-label {
+            font-size: 11px;
+        }
+
+        .metric-small .metric-value {
+            font-size: 24px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+            font-size: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 32px;
+        }
+
+        .icon-alert { color: var(--danger); }
+        .icon-warning { color: var(--warning); }
+        .icon-success { color: var(--success); }
+        .icon-info { color: var(--primary); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: var(--grid);
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: var(--light);
+        }
+    </style>
+</head>
+<body>
+    <div class="situation-room">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>
+                <span class="status-indicator"></span>
+                IT OPERATIONS SITUATION ROOM
+            </h1>
+            <p>Duke Kunshan University | Real-time operational intelligence | Fall 2026</p>
+        </div>
+
+        <!-- CURRENT STATE -->
+        <div class="section-title">
+            <span class="icon icon-info">📊</span> CURRENT STATE
+        </div>
+
+        <div class="grid-3">
+            <div class="card critical">
+                <div class="metric-label">Staffing</div>
+                <div class="metric-value">14</div>
+                <div class="metric-detail">Total IT personnel (including director)</div>
+                <div class="capacity-bar">
+                    <div class="capacity-fill" style="width: 100%;"></div>
+                </div>
+                <div style="font-size: 11px; color: var(--danger); margin-top: 8px; font-weight: 600;">AT MAXIMUM CAPACITY</div>
+            </div>
+
+            <div class="card alert">
+                <div class="metric-label">Weekly Course Sessions</div>
+                <div class="metric-value">852</div>
+                <div class="metric-detail">Distributed across 444 courses</div>
+                <div class="metric-small" style="margin-top: 12px; background: white; border: 1px solid var(--danger);">
+                    <div style="font-size: 11px; color: var(--danger); font-weight: 600;">Average: 170 sessions/day</div>
+                </div>
+            </div>
+
+            <div class="card alert">
+                <div class="metric-label">Faculty Needing Support</div>
+                <div class="metric-value">166</div>
+                <div class="metric-detail">Ready for tech training campaign</div>
+                <div class="metric-small" style="margin-top: 12px;">
+                    <div style="font-size: 11px;">164 Undergrad | 2 Graduate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KEY SIGNALS -->
+        <div class="section-title">
+            <span class="icon icon-alert">🚨</span> KEY SIGNALS - CRITICAL PATTERNS
+        </div>
+
+        <div class="grid-2">
+            <div class="card alert">
+                <h2>THE TUESDAY-THURSDAY CRISIS</h2>
+                <div class="signal-item critical">
+                    <strong>SIGNAL:</strong> 78% of weekly teaching load (665/852 sessions) concentrated in 3 days
+                </div>
+                <div class="signal-item critical">
+                    <strong>TUESDAY PEAK:</strong> 255 sessions (30% of entire week)
+                </div>
+                <div class="signal-item critical">
+                    <strong>MIDDAY BOTTLENECK:</strong> 40% of all daily sessions occur 12-3 PM (176 sessions)
+                </div>
+                <div class="signal-item critical">
+                    <strong>THE 2 PM HOUR:</strong> 83 sessions in a single hour = crisis point
+                </div>
+                <div style="margin-top: 12px; padding: 10px; background: white; border: 1px solid var(--danger); border-radius: 4px; font-size: 12px; color: var(--danger);">
+                    <strong>Impact:</strong> Your 14 staff cannot provide emergency response during these windows
+                </div>
+            </div>
+
+            <div class="card alert">
+                <h2>THE AV EMERGENCY</h2>
+                <div class="signal-item critical">
+                    <strong>THE PROBLEM:</strong> Classroom AV failures during peak hours disrupt 30-100 students instantly
+                </div>
+                <div class="signal-item critical">
+                    <strong>CURRENT MODEL:</strong> Emergency visit response = burnout for 1-2 IT staff
+                </div>
+                <div class="signal-item critical">
+                    <strong>SCALE MISMATCH:</strong> 170 daily classroom sessions with zero redundancy
+                </div>
+                <div class="signal-item critical">
+                    <strong>UNSUSTAINABLE:</strong> 5-10 AV failures/day × emergency response = staff exhaustion
+                </div>
+                <div style="margin-top: 12px; padding: 10px; background: white; border: 1px solid var(--danger); border-radius: 4px; font-size: 12px; color: var(--danger);">
+                    <strong>Hiring 5+ staff won't fix this</strong> — need system redesign
+                </div>
+            </div>
+        </div>
+
+        <!-- WEEKLY LOAD VISUALIZATION -->
+        <div class="section-title">
+            <span class="icon icon-warning">📈</span> WEEKLY TEACHING LOAD BY DAY
+        </div>
+
+        <div class="grid-5">
+            <div class="day-card">
+                <div class="day-name">MONDAY</div>
+                <div class="day-sessions">184</div>
+                <div class="day-percent">21.6% of load</div>
+            </div>
+            <div class="day-card peak">
+                <div class="day-name">🔴 TUESDAY</div>
+                <div class="day-sessions">255</div>
+                <div class="day-percent">29.9% PEAK</div>
+            </div>
+            <div class="day-card">
+                <div class="day-name">WEDNESDAY</div>
+                <div class="day-sessions">199</div>
+                <div class="day-percent">23.4% of load</div>
+            </div>
+            <div class="day-card">
+                <div class="day-name">THURSDAY</div>
+                <div class="day-sessions">211</div>
+                <div class="day-percent">24.8% of load</div>
+            </div>
+            <div class="day-card maintenance">
+                <div class="day-name">🟢 FRIDAY</div>
+                <div class="day-sessions">3</div>
+                <div class="day-percent">0.4% (Maintenance)</div>
+            </div>
+        </div>
+
+        <!-- PEAK HOURS -->
+        <div class="section-title">
+            <span class="icon icon-alert">⏰</span> PEAK HOURS - WHERE THE CRISIS HAPPENS
+        </div>
+
+        <div class="card alert">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time Block</th>
+                        <th>Sessions</th>
+                        <th>% of Daily Load</th>
+                        <th>Required Staff</th>
+                        <th>Your Capacity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: #fef2f2;">
+                        <td><strong>2:00-3:00 PM 🔴</strong></td>
+                        <td><strong>83</strong></td>
+                        <td><strong>18.9%</strong></td>
+                        <td><strong>17 staff</strong></td>
+                        <td style="color: var(--danger);"><strong>14 total</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>10:00-11:00 AM</strong></td>
+                        <td><strong>62</strong></td>
+                        <td>14.1%</td>
+                        <td>12 staff</td>
+                        <td style="color: var(--danger);">Need overlap</td>
+                    </tr>
+                    <tr>
+                        <td>12:00-3:00 PM (BLOCK)</td>
+                        <td><strong>176</strong></td>
+                        <td><strong>40.1%</strong></td>
+                        <td><strong>35 staff</strong></td>
+                        <td style="color: var(--danger);"><strong>IMPOSSIBLE</strong></td>
+                    </tr>
+                    <tr>
+                        <td>9:00 AM-12:00 PM</td>
+                        <td>107</td>
+                        <td>24.4%</td>
+                        <td>21 staff</td>
+                        <td style="color: var(--danger);">Severe gap</td>
+                    </tr>
+                    <tr style="background: #f0fdf4;">
+                        <td><strong>Friday All Day 🟢</strong></td>
+                        <td><strong>3</strong></td>
+                        <td>0.4%</td>
+                        <td>1 staff</td>
+                        <td style="color: var(--success);">✓ Available</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- EMERGING THEMES -->
+        <div class="section-title">
+            <span class="icon icon-info">🔍</span> EMERGING THEMES & PATTERNS
+        </div>
+
+        <div class="grid-2">
+            <div class="card success">
+                <h2>50% of Courses Meet 2x/Week</h2>
+                <div class="signal-item opportunity">
+                    <strong>INSIGHT:</strong> 223 courses follow predictable MWF or TR patterns
+                </div>
+                <div class="signal-item opportunity">
+                    <strong>PLANNING OPPORTUNITY:</strong> Schedulable, batched support possible
+                </div>
+                <div class="signal-item opportunity">
+                    <strong>BENEFIT:</strong> Can pre-position staff for known bottlenecks
+                </div>
+            </div>
+
+            <div class="card success">
+                <h2>Friday = Blank Slate</h2>
+                <div class="signal-item opportunity">
+                    <strong>DISCOVERY:</strong> Only 3 sessions all of Friday (0.4% of weekly load)
+                </div>
+                <div class="signal-item opportunity">
+                    <strong>HIDDEN RESOURCE:</strong> Full day available for maintenance, training, planning
+                </div>
+                <div class="signal-item opportunity">
+                    <strong>STRATEGIC MOVE:</strong> Friday is your control lever for sustainability
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>The "Prevent vs. Respond" Inflection</h2>
+                <div class="signal-item">
+                    <strong>THE CHOICE:</strong> Hire 3+ staff OR redesign to prevent 70% of issues
+                </div>
+                <div class="signal-item">
+                    <strong>COST REALITY:</strong> Prevention: $5-30K/year | Hiring: $240K+/year
+                </div>
+                <div class="signal-item">
+                    <strong>SUSTAINABILITY:</strong> Prevention scales; emergency response doesn't
+                </div>
+                <div style="margin-top: 12px; padding: 10px; background: #f0f9ff; border: 1px solid var(--primary); border-radius: 4px; font-size: 12px;">
+                    This is not an operational decision — it's a <strong>business model</strong> choice
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Faculty Training = System Redesign</h2>
+                <div class="signal-item">
+                    <strong>DISCOVERY:</strong> 166 faculty can be trained to solve 70% of AV issues
+                </div>
+                <div class="signal-item">
+                    <strong>EMAIL CAMPAIGN READY:</strong> All faculty emails extracted; messaging templates prepared
+                </div>
+                <div class="signal-item">
+                    <strong>MULTIPLIER EFFECT:</strong> Each faculty trained = fewer emergency calls
+                </div>
+                <div style="margin-top: 12px; padding: 10px; background: #f0f9ff; border: 1px solid var(--primary); border-radius: 4px; font-size: 12px;">
+                    This is your <strong>highest-impact, lowest-cost</strong> next move
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- RISKS -->
+        <div class="section-title">
+            <span class="icon icon-alert">⚠️</span> CRITICAL RISKS
+        </div>
+
+        <div class="grid-2">
+            <div class="card alert">
+                <div class="risk-item">
+                    <div class="risk-title">🔴 IMMEDIATE: 2:00 PM Tuesday-Thursday Collapse</div>
+                    <p>83 sessions/hour with 14 total staff = guaranteed failures during peak hour</p>
+                    <div class="risk-impact"><strong>Timeline:</strong> Will manifest first week of classes | <strong>Impact:</strong> Faculty frustration spike, student disruptions</div>
+                </div>
+
+                <div class="risk-item">
+                    <div class="risk-title">🔴 URGENT: AV Emergency Response Model</div>
+                    <p>Current "call IT when it breaks" model doesn't scale to 170 daily sessions</p>
+                    <div class="risk-impact"><strong>Timeline:</strong> Burnout visible by week 2-3 | <strong>Impact:</strong> Staff turnover risk, morale collapse</div>
+                </div>
+
+                <div class="risk-item">
+                    <div class="risk-title">🟠 HIGH: Midday Network Strain</div>
+                    <p>40% of daily traffic in 3-hour window = bandwidth/equipment saturation risk</p>
+                    <div class="risk-impact"><strong>Timeline:</strong> Peak hours may see slowdowns | <strong>Impact:</strong> Cascading failures across all systems</div>
+                </div>
+
+                <div class="risk-item">
+                    <div class="risk-title">🟠 HIGH: Silent Failure Risk</div>
+                    <p>37 online/TBD courses with zero monitoring = support gaps hidden until semester end</p>
+                    <div class="risk-impact"><strong>Timeline:</strong> Discovered late; hard to fix | <strong>Impact:</strong> Compliance, student satisfaction issues</div>
+                </div>
+            </div>
+
+            <div class="card alert">
+                <div class="risk-item">
+                    <div class="risk-title">🟡 MEDIUM: Help Desk Queue Collapse</div>
+                    <p>Midday peaks will cause 45+ min wait times for support tickets</p>
+                    <div class="risk-impact"><strong>Timeline:</strong> First 2 weeks of semester | <strong>Impact:</strong> Negative feedback, escalations to administration</div>
+                </div>
+
+                <div class="risk-item">
+                    <div class="risk-title">🟡 MEDIUM: Lab Capacity Overrun</div>
+                    <p>Computer labs peak same times as classroom sessions = double load</p>
+                    <div class="risk-impact"><strong>Timeline:</strong> Concurrent with teaching peaks | <strong>Impact:</strong> Lab equipment failures, classes cancelled</div>
+                </div>
+
+                <div class="risk-item">
+                    <div class="risk-title">🟡 MEDIUM: Maintenance Debt Accumulation</div>
+                    <p>All resources absorbed by emergency response = zero proactive maintenance capacity</p>
+                    <div class="risk-impact"><strong>Timeline:</strong> Accumulates week-by-week | <strong>Impact:</strong> Equipment lifespan shortens, failure rates increase</div>
+                </div>
+
+                <div class="risk-item">
+                    <div class="risk-title">🔵 LOWER: Staffing Retention</div>
+                    <p>Unsustainable workload during peaks = retention risk for best people</p>
+                    <div class="risk-impact"><strong>Timeline:</strong> Visible by mid-semester | <strong>Impact:</strong> Turnover; rehire/retrain costs</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- OPPORTUNITIES -->
+        <div class="section-title">
+            <span class="icon icon-success">💡</span> STRATEGIC OPPORTUNITIES
+        </div>
+
+        <div class="grid-2">
+            <div class="card success">
+                <div class="opportunity-item">
+                    <div class="opportunity-title">🟢 IMMEDIATE: Faculty Tech Training Campaign</div>
+                    <p>Email 166 faculty with "Pre-class AV Checklist" training before semester starts</p>
+                    <div class="opportunity-impact"><strong>Cost:</strong> $50-100 | <strong>Impact:</strong> 30-40% AV call reduction | <strong>Timeline:</strong> Can execute Week 1</div>
+                </div>
+
+                <div class="opportunity-item">
+                    <div class="opportunity-title">🟢 QUICK WIN: Classroom Redundancy</div>
+                    <p>Add backup monitors to 10 high-traffic classrooms (~$5K investment)</p>
+                    <div class="opportunity-impact"><strong>Cost:</strong> $5,000 one-time | <strong>Impact:</strong> Eliminates single-point-of-failure emergencies | <strong>Timeline:</strong> 4-week implementation</div>
+                </div>
+
+                <div class="opportunity-item">
+                    <div class="opportunity-title">💰 COST PLAY: Prevent vs. Hire Model</div>
+                    <p>Shift from "emergency response" to "prevention-first" = 10x cost reduction</p>
+                    <div class="opportunity-impact"><strong>Savings:</strong> $200K+/year vs. hiring | <strong>Impact:</strong> Better service, less burnout | <strong>Timeline:</strong> Implementable immediately</div>
+                </div>
+
+                <div class="opportunity-item">
+                    <div class="opportunity-title">📊 DATA PLAY: Request Prioritization System</div>
+                    <p>Google Form for AV requests reveals usage patterns; enables smart allocation</p>
+                    <div class="opportunity-impact"><strong>Cost:</strong> Free | <strong>Impact:</strong> Data-driven staffing decisions | <strong>Timeline:</strong> Live in 1 week</div>
+                </div>
+            </div>
+
+            <div class="card success">
+                <div class="opportunity-item">
+                    <div class="opportunity-title">🟢 LEVERAGE: Friday as Control Lever</div>
+                    <p>Use empty Friday to run maintenance, training, equipment repairs proactively</p>
+                    <div class="opportunity-impact"><strong>Cost:</strong> $0 | <strong>Impact:</strong> Prevents Monday-Thursday emergency backlog | <strong>Timeline:</strong> Immediate</div>
+                </div>
+
+                <div class="opportunity-item">
+                    <div class="opportunity-title">🟢 REMOTE SUPPORT DEPLOYMENT</div>
+                    <p>TeamViewer/AnyDesk for classroom AV issues = instant diagnosis without visiting classroom</p>
+                    <div class="opportunity-impact"><strong>Cost:</strong> $30-50/month | <strong>Impact:</strong> 50% call reduction, 10-min response | <strong>Timeline:</strong> 2-week setup</div>
+                </div>
+
+                <div class="opportunity-item">
+                    <div class="opportunity-title">📈 CAPACITY EXPANSION Without Hiring</div>
+                    <p>Combine prevention + remote + part-time AV tech = 170-session capacity sustained with 14 core staff</p>
+                    <div class="opportunity-impact"><strong>Cost:</strong> $25K/year (1 PT) vs. $80K (1 FTE) | <strong>Impact:</strong> Full capacity coverage | <strong>Timeline:</strong> 8-week ramp</div>
+                </div>
+
+                <div class="opportunity-item">
+                    <div class="opportunity-title">🎯 ADVOCACY OPENING: Show Director the Math</div>
+                    <p>Present 3-month data showing prevention ROI; unlock budget for phases 5-7</p>
+                    <div class="opportunity-impact"><strong>Cost:</strong> $0 (just tracking) | <strong>Impact:</strong> Enables sustainable system build | <strong>Timeline:</strong> Measurement starts Week 1</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- HIDDEN CONNECTIONS -->
+        <div class="section-title">
+            <span class="icon icon-info">🔗</span> HIDDEN CONNECTIONS & LEVERAGE POINTS
+        </div>
+
+        <div class="grid-3">
+            <div class="card">
+                <h2>Connection #1: The Faculty Multiplier</h2>
+                <p><strong>Insight:</strong> Train 166 faculty on "5 AV fixes" → each becomes force multiplier for their own classroom</p>
+                <p style="margin-top: 8px;"><strong>Leverage:</strong> One 15-min faculty training = reduced emergency calls for entire year</p>
+                <p style="margin-top: 8px;"><strong>Hidden value:</strong> Faculty become IT's allies, not just requestors</p>
+            </div>
+
+            <div class="card">
+                <h2>Connection #2: Peak Hours = Decision Points</h2>
+                <p><strong>Insight:</strong> 2:00 PM Tuesday = when you'll be asked to make staff decisions</p>
+                <p style="margin-top: 8px;"><strong>Leverage:</strong> Design your system now (prevent) vs. scramble then (emergency)</p>
+                <p style="margin-top: 8px;"><strong>Hidden value:</strong> Prevention system is your competitive advantage vs. crisis</p>
+            </div>
+
+            <div class="card">
+                <h2>Connection #3: Friday = Your Escape Valve</h2>
+                <p><strong>Insight:</strong> Friday's emptiness absorbs Monday-Thursday's debt</p>
+                <p style="margin-top: 8px;"><strong>Leverage:</strong> One day of downtime = entire week of proactive prep</p>
+                <p style="margin-top: 8px;"><strong>Hidden value:</strong> Sustainability is built into the schedule, not staffing</p>
+            </div>
+
+            <div class="card">
+                <h2>Connection #4: Classroom RAS = Single Point of Failure</h2>
+                <p><strong>Insight:</strong> One broken projector during peak = cascading disruptions</p>
+                <p style="margin-top: 8px;"><strong>Leverage:</strong> Backup displays eliminate emergency response bottleneck</p>
+                <p style="margin-top: 8px;"><strong>Hidden value:</strong> $5K investment removes $240K hiring need</p>
+            </div>
+
+            <div class="card">
+                <h2>Connection #5: Email Campaign = Intelligence Tool</h2>
+                <p><strong>Insight:</strong> 166 faculty responses show real AV pain points, not assumed ones</p>
+                <p style="margin-top: 8px;"><strong>Leverage:</strong> Faculty input guides where to spend maintenance budget</p>
+                <p style="margin-top: 8px;"><strong>Hidden value:</strong> Data-driven fixes beat intuition-driven ones</p>
+            </div>
+
+            <div class="card">
+                <h2>Connection #6: Prevention = Staff Morale</h2>
+                <p><strong>Insight:</strong> Emergency response creates burnout; prevention creates slack</p>
+                <p style="margin-top: 8px;"><strong>Leverage:</strong> Happy staff with time = better service quality</p>
+                <p style="margin-top: 8px;"><strong>Hidden value:</strong> Morale improvement is retention improvement</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- TIMELINE & CRITICAL DECISIONS -->
+        <div class="section-title">
+            <span class="icon icon-warning">📅</span> CRITICAL TIMELINE & DECISIONS NEEDED
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h2>NOW (Before Classes Start)</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-label">Week 1: Decide Prevention vs. Emergency</div>
+                        <div class="timeline-description">This week you choose your model. Choice made now determines all downstream capacity</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-label">Week 2-3: Launch Faculty Email Campaign</div>
+                        <div class="timeline-description">Send training to 166 faculty. Window closes once classes start</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-label">Week 3-4: Deploy Remote Support Tool</div>
+                        <div class="timeline-description">TeamViewer/AnyDesk + staff training. Must be live before peak hours hit</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>FIRST 2 WEEKS (Classes Running)</h2>
+                <div class="timeline">
+                    <div class="timeline-item at-risk">
+                        <div class="timeline-label">Day 1: First Peak Hours Stress Test</div>
+                        <div class="timeline-description">You'll feel the system strain immediately. Track call volume, response times</div>
+                    </div>
+                    <div class="timeline-item at-risk">
+                        <div class="timeline-label">Day 3-5: Tuesday Peak — Reality Check</div>
+                        <div class="timeline-description">255 sessions hit; this is where the 14-staff limitation becomes obvious</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-label">End of Week 2: Early Intervention Window</div>
+                        <div class="timeline-description">Last chance to adjust course. Data shows what's working/breaking</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>MONTH 1 (Measurement & Proof)</h2>
+                <div class="timeline">
+                    <div class="timeline-item completed">
+                        <div class="timeline-label">Week 3-4: Prevention Strategies Show ROI</div>
+                        <div class="timeline-description">Faculty training, remote support, pre-flight checks cut calls by 30-50%</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-label">Week 4: Report to Director</div>
+                        <div class="timeline-description">Present data: "Prevention saved X hours, prevented Y failures." Unlock Phase 5-7 budget</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>MONTH 2-3 (Scale Phase)</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-label">Week 6-8: Install Classroom Redundancy</div>
+                        <div class="timeline-description">Backup monitors in 10 rooms. Emergency visits drop by half</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-label">Week 10-12: Hire Part-Time AV Tech</div>
+                        <div class="timeline-description">One part-time person ($25K/yr) + prevention system = sustainable capacity</div>
+                    </div>
+                    <div class="timeline-item completed">
+                        <div class="timeline-label">Month 4+: Sustainable Model Live</div>
+                        <div class="timeline-description">System absorbs 852 weekly sessions with 14 core + 1 PT staff</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- DECISION MATRIX -->
+        <div class="section-title">
+            <span class="icon icon-warning">🎯</span> DECISION MATRIX: THE CHOICE AHEAD
+        </div>
+
+        <div class="decision-matrix">
+            <div class="decision-box" style="border: 2px solid var(--danger);">
+                <strong>OPTION A: Emergency Response Model</strong>
+                <p><strong>What you do:</strong> Try to staff for emergency AV response during peak hours</p>
+                <p><strong>Cost:</strong> $240K/year (hire 3+ staff)</p>
+                <p><strong>Outcome:</strong> Burnout by month 2, turnover by month 4, unsustainable</p>
+                <p style="color: var(--danger); margin-top: 8px;"><strong>❌ NOT RECOMMENDED</strong></p>
+            </div>
+
+            <div class="decision-box" style="border: 2px solid var(--success);">
+                <strong>OPTION B: Prevention-First Model (RECOMMENDED)</strong>
+                <p><strong>What you do:</strong> Prevent 70% of issues, support 20% remotely, repair 10% offline</p>
+                <p><strong>Cost:</strong> $5.5K Year 1, $25K/year ongoing (1 PT staff)</p>
+                <p><strong>Outcome:</strong> Sustainable with 14 core staff, better service, staff retention</p>
+                <p style="color: var(--success); margin-top: 8px;"><strong>✓ RECOMMENDED - Choose This</strong></p>
+            </div>
+        </div>
+
+        <!-- OPEN QUESTIONS -->
+        <div class="section-title">
+            <span class="icon icon-info">❓</span> OPEN QUESTIONS THAT NEED ANSWERS
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="signal-item">
+                    <strong>Q1:</strong> Will the director fund the $5K backup monitor investment?
+                </div>
+                <div class="signal-item">
+                    <strong>Q2:</strong> Can you find a PT AV technician who works 15-20 hrs/week at $25K/year?
+                </div>
+                <div class="signal-item">
+                    <strong>Q3:</strong> Will 70%+ of faculty engage with the email training campaign?
+                </div>
+                <div class="signal-item">
+                    <strong>Q4:</strong> Which 10 classrooms should get backup monitors first (highest traffic)?
+                </div>
+                <div class="signal-item">
+                    <strong>Q5:</strong> What's your backup if a core staff member leaves mid-semester?
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="signal-item">
+                    <strong>Q6:</strong> Can IT accommodate Friday "maintenance day" or are there other priorities?
+                </div>
+                <div class="signal-item">
+                    <strong>Q7:</strong> Is remote troubleshooting (TeamViewer) technically feasible in your environment?
+                </div>
+                <div class="signal-item">
+                    <strong>Q8:</strong> Who owns the "faculty self-service fix" project (IT + training)?
+                </div>
+                <div class="signal-item">
+                    <strong>Q9:</strong> What's the cost baseline for classroom AV equipment replacement/repair?
+                </div>
+                <div class="signal-item">
+                    <strong>Q10:</strong> How will you measure success (KPIs for call reduction, response time)?
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- RECOMMENDED NEXT MOVES -->
+        <div class="section-title">
+            <span class="icon icon-success">⚡</span> RECOMMENDED NEXT MOVES (In Priority Order)
+        </div>
+
+        <div class="grid-2">
+            <div class="card success">
+                <h2>MOVE #1 (This Week)</h2>
+                <div class="signal-item opportunity" style="margin-bottom: 12px;">
+                    <strong>Launch Faculty Email Campaign</strong>
+                </div>
+                <p style="font-size: 13px; margin-bottom: 12px;">Send "Pre-class AV Checklist" training to all 166 faculty. You have 166 emails ready + email template prepared.</p>
+                <div style="padding: 10px; background: #f0fdf4; border: 1px solid var(--success); border-radius: 4px; font-size: 12px;">
+                    <strong>Impact:</strong> 30-40% AV call reduction | <strong>Cost:</strong> $0 | <strong>Time:</strong> 2 hours
+                </div>
+            </div>
+
+            <div class="card success">
+                <h2>MOVE #2 (Next Week)</h2>
+                <div class="signal-item opportunity" style="margin-bottom: 12px;">
+                    <strong>Present Prevention Model to Director</strong>
+                </div>
+                <p style="font-size: 13px; margin-bottom: 12px;">Show the math: Prevention ($5.5K + 1 PT) vs. Hiring (3+ staff @ $240K). Unlock budget for phases 5-7.</p>
+                <div style="padding: 10px; background: #f0fdf4; border: 1px solid var(--success); border-radius: 4px; font-size: 12px;">
+                    <strong>Impact:</strong> Budget approval | <strong>Cost:</strong> $0 | <strong>Time:</strong> 1 hour prep
+                </div>
+            </div>
+
+            <div class="card success">
+                <h2>MOVE #3 (Before Classes)</h2>
+                <div class="signal-item opportunity" style="margin-bottom: 12px;">
+                    <strong>Deploy Remote Support Tool</strong>
+                </div>
+                <p style="font-size: 13px; margin-bottom: 12px;">Install TeamViewer or AnyDesk. Brief 3 staff on remote troubleshooting. Test on 5 classrooms.</p>
+                <div style="padding: 10px; background: #f0fdf4; border: 1px solid var(--success); border-radius: 4px; font-size: 12px;">
+                    <strong>Impact:</strong> 50% call reduction (remote support) | <strong>Cost:</strong> $30/month | <strong>Time:</strong> 4 hours
+                </div>
+            </div>
+
+            <div class="card success">
+                <h2>MOVE #4 (Week 1-2 of Classes)</h2>
+                <div class="signal-item opportunity" style="margin-bottom: 12px;">
+                    <strong>Establish Google Form Request System</strong>
+                </div>
+                <p style="font-size: 13px; margin-bottom: 12px;">Set up AV request form so faculty report issues via queue (not random calls). Track every issue.</p>
+                <div style="padding: 10px; background: #f0fdf4; border: 1px solid var(--success); border-radius: 4px; font-size: 12px;">
+                    <strong>Impact:</strong> Transparency + data | <strong>Cost:</strong> $0 | <strong>Time:</strong> 1 hour
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>MOVE #5 (After 4 Weeks - Data Driven)</h2>
+                <div class="signal-item" style="margin-bottom: 12px; border-left-color: var(--primary);">
+                    <strong>Implement Classroom Redundancy</strong>
+                </div>
+                <p style="font-size: 13px; margin-bottom: 12px;">Once you have 4 weeks of data showing which 10 rooms have most failures, install backup monitors ($5K).</p>
+                <div style="padding: 10px; background: #f0f9ff; border: 1px solid var(--primary); border-radius: 4px; font-size: 12px;">
+                    <strong>Impact:</strong> Eliminates single-point failures | <strong>Cost:</strong> $5K | <strong>Time:</strong> 2-week install
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>MOVE #6 (Month 2-3)</h2>
+                <div class="signal-item" style="margin-bottom: 12px; border-left-color: var(--primary);">
+                    <strong>Hire Part-Time AV Technician</strong>
+                </div>
+                <p style="font-size: 13px; margin-bottom: 12px;">Once system is running, hire PT person to handle repairs/maintenance. Frees core staff from fixing equipment.</p>
+                <div style="padding: 10px; background: #f0f9ff; border: 1px solid var(--primary); border-radius: 4px; font-size: 12px;">
+                    <strong>Impact:</strong> Closes capacity gap | <strong>Cost:</strong> $25K/year | <strong>Time:</strong> 2-week onboard
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🎯 <strong>THE BOTTOM LINE:</strong> You don't have a staffing problem. You have a <strong>system design problem</strong>.
+            Solve the design (prevent issues, empower faculty, support remotely) and 14 staff becomes sustainable.
+            Try to solve with staffing alone and you'll burn through budget and burn out your team.</p>
+            <p style="margin-top: 12px;">📊 Last updated: August 5, 2026 | Situation Room v1.0</p>
+        </div>
+    </div>
+</body>
+</html>
