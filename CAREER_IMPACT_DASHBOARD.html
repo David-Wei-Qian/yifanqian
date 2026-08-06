@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wei (David) Qian - Career Impact Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e40af;
+            --secondary: #7c3aed;
+            --accent: #059669;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+            }
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            box-shadow: 0 20px 60px rgba(30, 64, 175, 0.3);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 24px;
+                margin-bottom: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+
+        .header .subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .header .subtitle {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header .subtitle {
+                font-size: 12px;
+            }
+        }
+
+        .header .tagline {
+            font-size: 14px;
+            opacity: 0.85;
+            font-style: italic;
+        }
+
+        @media (max-width: 480px) {
+            .header .tagline {
+                font-size: 11px;
+            }
+        }
+
+        /* SECTION TITLE */
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .section-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+                gap: 8px;
+            }
+        }
+
+        .section-title .icon {
+            font-size: 28px;
+        }
+
+        @media (max-width: 480px) {
+            .section-title .icon {
+                font-size: 22px;
+            }
+        }
+
+        /* GRID LAYOUTS */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid-2 {
+                gap: 12px;
+                margin-bottom: 24px;
+            }
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid-3 {
+                gap: 12px;
+                margin-bottom: 24px;
+            }
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid-4 {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 24px;
+            }
+        }
+
+        /* CARD */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 16px;
+                border-radius: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 12px;
+                border-radius: 8px;
+            }
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .card.highlight {
+            border: 2px solid var(--primary);
+            background: linear-gradient(135deg, #f0f9ff 0%, #f3f4f6 100%);
+        }
+
+        .card h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .card h3 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .card p {
+                font-size: 13px;
+            }
+        }
+
+        /* METRIC CARDS */
+        .metric-large {
+            text-align: center;
+            padding: 32px 20px;
+        }
+
+        @media (max-width: 480px) {
+            .metric-large {
+                padding: 20px 12px;
+            }
+        }
+
+        .metric-large .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .metric-large .label {
+                font-size: 10px;
+            }
+        }
+
+        .metric-large .value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .metric-large .value {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metric-large .value {
+                font-size: 28px;
+            }
+        }
+
+        .metric-large .description {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 480px) {
+            .metric-large .description {
+                font-size: 11px;
+            }
+        }
+
+        .metric-detail {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 480px) {
+            .metric-detail {
+                font-size: 10px;
+            }
+        }
+
+        /* TIMELINE */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            margin-bottom: 32px;
+            padding-left: 60px;
+            position: relative;
+        }
+
+        @media (max-width: 480px) {
+            .timeline-item {
+                margin-bottom: 24px;
+                padding-left: 50px;
+            }
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border: 4px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px var(--primary);
+        }
+
+        @media (max-width: 480px) {
+            .timeline-item::before {
+                width: 32px;
+                height: 32px;
+                border-width: 3px;
+            }
+        }
+
+        .timeline-item.milestone::before {
+            background: var(--secondary);
+            box-shadow: 0 0 0 3px var(--secondary);
+        }
+
+        .timeline-item.success::before {
+            background: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 40px;
+            bottom: -32px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), transparent);
+        }
+
+        @media (max-width: 480px) {
+            .timeline-item::after {
+                left: 15px;
+                top: 32px;
+            }
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .timeline-date {
+                font-size: 10px;
+            }
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        @media (max-width: 480px) {
+            .timeline-title {
+                font-size: 14px;
+            }
+        }
+
+        .timeline-description {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 480px) {
+            .timeline-description {
+                font-size: 12px;
+            }
+        }
+
+        /* IMPACT BADGE */
+        .impact-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent), #10b981);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ACHIEVEMENT GRID */
+        .achievement-item {
+            padding: 16px;
+            background: linear-gradient(135deg, #f0f9ff, #f9f5ff);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .achievement-item {
+                padding: 12px;
+                margin-bottom: 10px;
+            }
+        }
+
+        .achievement-item.secondary {
+            border-left-color: var(--secondary);
+            background: linear-gradient(135deg, #faf5ff, #f9f5ff);
+        }
+
+        .achievement-item.accent {
+            border-left-color: var(--accent);
+            background: linear-gradient(135deg, #f0fdf4, #f9f5ff);
+        }
+
+        .achievement-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .achievement-title {
+                font-size: 13px;
+            }
+        }
+
+        .achievement-desc {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 480px) {
+            .achievement-desc {
+                font-size: 11px;
+            }
+        }
+
+        /* SKILLS MATRIX */
+        .skills-group {
+            margin-bottom: 24px;
+        }
+
+        .skills-group h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .skill-name {
+            font-size: 13px;
+            font-weight: 600;
+            min-width: 120px;
+            color: var(--dark);
+        }
+
+        .skill-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .skill-level {
+            font-size: 11px;
+            color: #9ca3af;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        /* CHART CONTAINER */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 24px;
+        }
+
+        /* GROWTH INDICATORS */
+        .growth-item {
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            .growth-item {
+                padding: 14px;
+            }
+        }
+
+        .growth-label {
+            font-size: 12px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .growth-label {
+                font-size: 10px;
+            }
+        }
+
+        .growth-before {
+            font-size: 28px;
+            font-weight: 700;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .growth-before {
+                font-size: 20px;
+            }
+        }
+
+        .growth-arrow {
+            font-size: 24px;
+            color: var(--accent);
+            margin: 8px 0;
+        }
+
+        @media (max-width: 480px) {
+            .growth-arrow {
+                font-size: 20px;
+                margin: 6px 0;
+            }
+        }
+
+        .growth-after {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        @media (max-width: 480px) {
+            .growth-after {
+                font-size: 28px;
+            }
+        }
+
+        /* NARRATIVE BOX */
+        .narrative {
+            background: linear-gradient(135deg, #fef3c7, #fef8e7);
+            border-left: 4px solid var(--warning);
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #78350f;
+        }
+
+        .narrative strong {
+            color: #92400e;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: #9ca3af;
+            font-size: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        /* DIVIDER */
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 40px 0;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            .header {
+                padding: 24px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>Wei (David) Qian</h1>
+            <div class="subtitle">Associate Director, IT Operations & Support</div>
+            <div class="tagline">20+ Years of Proven IT Leadership • Global Operations • Supporting 2,800+ Community Members</div>
+        </div>
+
+        <!-- THE STORY -->
+        <div class="narrative">
+            <strong>Leadership Profile:</strong> Wei is a strategic IT operations leader with 20 years of experience across manufacturing, retail, and education sectors. He spent 13 years building a global IT operation at Crown Equipment (stable, scaled, reliable), then deliberately transitioned to Duke Kunshan University to lead through institutional growth and transformation. He navigated a pandemic that disrupted global education, managed IT support for expanding student population (from 1,100 to 2,100 students), and demonstrated the ability to maintain 95% user satisfaction while supporting 2,800+ community members (students, staff, faculty). Wei continuously invests in his own development (PMP, ITIL, MBA, leadership coaching) and mentors his team—he has promoted 2 managers from within. His career reflects a leader who doesn't avoid complexity; he seeks it, masters it, and teaches others to navigate it.
+        </div>
+
+        <!-- CORE METRICS -->
+        <div class="section-title">
+            <span class="icon">📊</span> Proven Track Record
+        </div>
+
+        <div class="grid-4">
+            <div class="card metric-large">
+                <div class="label">User Satisfaction</div>
+                <div class="value">95%</div>
+                <div class="description">Maintained through growth & pandemic</div>
+            </div>
+
+            <div class="card metric-large">
+                <div class="label">Quick Resolution</div>
+                <div class="value">75%</div>
+                <div class="description">Tickets resolved within a week</div>
+            </div>
+
+            <div class="card metric-large">
+                <div class="label">Enrollment Growth</div>
+                <div class="value">2x</div>
+                <div class="description">250 → 500 students (Phase II)</div>
+            </div>
+
+            <div class="card metric-large">
+                <div class="label">Team Development</div>
+                <div class="value">2</div>
+                <div class="description">Managers promoted from within</div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- GROWTH VISUALIZATION -->
+        <div class="section-title">
+            <span class="icon">📈</span> Leadership Impact: Supporting & Navigating Change
+        </div>
+
+        <div class="grid-3">
+            <div class="growth-item">
+                <div class="growth-label">Student Community Supported</div>
+                <div class="growth-before">1,100</div>
+                <div class="growth-arrow">↗</div>
+                <div class="growth-after">2,100</div>
+                <div class="metric-detail">~250→500 per cohort (4 cohorts) + 100 grad</div>
+            </div>
+
+            <div class="growth-item">
+                <div class="growth-label">Total Community Served</div>
+                <div class="growth-before">~2,300</div>
+                <div class="growth-arrow">↗</div>
+                <div class="growth-after">2,800+</div>
+                <div class="metric-detail">Students, staff (~500), faculty (~200)</div>
+            </div>
+
+            <div class="growth-item">
+                <div class="growth-label">Stakeholder Satisfaction</div>
+                <div class="growth-before">Baseline</div>
+                <div class="growth-arrow">↗</div>
+                <div class="growth-after">95%</div>
+                <div class="metric-detail">Consistent quality through institutional change</div>
+            </div>
+        </div>
+
+        <!-- CAREER TIMELINE -->
+        <div class="section-title">
+            <span class="icon">⏱️</span> Career Arc: Building Expertise Across Industries
+        </div>
+
+        <div class="card">
+            <div class="timeline">
+                <div class="timeline-item success">
+                    <div class="timeline-date">2004-2006</div>
+                    <div class="timeline-title">Foundation: HOYA & Kemet</div>
+                    <div class="timeline-description">Built core IT infrastructure skills. System support, infrastructure, ERP fundamentals. Established technical foundation that enabled career progression across multiple industries.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2006-2010 (4 years)</div>
+                    <div class="timeline-title">Growing Technical Leadership at Crown</div>
+                    <div class="timeline-description">Progressed from IT Engineer to IT Supervisor. Led global ERP/CRM implementation across Crown's international operations. Developed deep understanding of how technology serves manufacturing and retail business operations.</div>
+                    <span class="impact-badge">✓ Technical Leadership</span>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2010-2015 (5 years)</div>
+                    <div class="timeline-title">Strategic Operations at Scale</div>
+                    <div class="timeline-description">Implemented IT Service Management System based on ITIL best practices. Built and maintained infrastructure for 1 manufacturing plant and 6 sales branches across China. Managed direct team of 3 while leveraging hundreds of Crown IT resources globally. Traveled to Crown USA for training multiple times to develop expertise.</div>
+                    <span class="impact-badge">✓ Global Collaboration</span>
+                </div>
+
+                <div class="timeline-item milestone">
+                    <div class="timeline-date">2015-2019 (IT Manager)</div>
+                    <div class="timeline-title">Peak Operations Leadership</div>
+                    <div class="timeline-description">Promoted to IT Manager. Full responsibility for Crown IT functions: business systems leadership (40%), IT operations & cybersecurity (30%), IT helpdesk (20%), governance & audit (10%). Successfully managed complex, distributed operations across multiple countries. Starting in 2015, attended annual global IT meetings with colleagues from US, Europe, Brazil, and Australia.</div>
+                    <span class="impact-badge">✓ Global Leadership</span>
+                </div>
+
+                <div class="timeline-item milestone">
+                    <div class="timeline-date">October 2019</div>
+                    <div class="timeline-title">Strategic Transition: Higher Education Leadership</div>
+                    <div class="timeline-description">Joined Duke Kunshan University as IT Manager. Transition from manufacturing/retail to education sector. Initial enrollment: 200 Chinese + 50 international students = 250 total. Responsible for building IT operations in an emerging institution.</div>
+                    <span class="impact-badge">✓ Sector Change</span>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2019-2020</div>
+                    <div class="timeline-title">Institutional Foundation Building</div>
+                    <div class="timeline-description">Supported inaugural commencement ceremony. Learned education sector dynamics. Engaged faculty and staff in IT service design. Built relationships and credibility within university community.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2020-2021 (Pandemic Period)</div>
+                    <div class="timeline-title">Crisis Navigation: Pandemic Response</div>
+                    <div class="timeline-description">Led IT through unprecedented global challenge. Hybrid teaching required complete rethinking of support model. Engaged faculty in classroom technology review. Analyzed course and classroom usage data to inform strategic planning. Result: Maintained service delivery and user satisfaction through crisis period.</div>
+                    <span class="impact-badge">✓ Crisis Leadership</span>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">June 2023 (Phase II)</div>
+                    <div class="timeline-title">Scaling Through Institutional Growth</div>
+                    <div class="timeline-description">University expanded significantly. Student population increased to 2,100 (500 per cohort × 4 cohorts + 100 graduate students). Also supporting expanded staff and faculty. Expanded facility footprint with additional buildings and spaces requiring IT coverage. Maintained IT service delivery and 95% user satisfaction for 2,800+ community members during institutional growth phase.</div>
+                    <span class="impact-badge">✓ Growth Support</span>
+                </div>
+
+                <div class="timeline-item milestone">
+                    <div class="timeline-date">June 2023</div>
+                    <div class="timeline-title">Promoted to Associate Director</div>
+                    <div class="timeline-description">Promoted to Associate Director of IT Operations & Support in same month as Phase II expansion. Expanded strategic and leadership responsibilities. Now responsible for: Planning (30%), Leading (40%), Organizing (15%), Controlling (10%), and Innovating (5%) of IT operations. Promoted 2 managers from within team.</div>
+                    <span class="impact-badge">✓ Strategic Leadership</span>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2023-2024</div>
+                    <div class="timeline-title">Continued Growth Support & Team Leadership</div>
+                    <div class="timeline-description">Led IT operations during continued institutional growth phase. Maintained 95% user satisfaction and reliable service delivery. Focused on team development, process improvement through ITIL4 implementation, and supporting faculty and student needs across expanded operations.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2025</div>
+                    <div class="timeline-title">Navigating Organizational Restructuring</div>
+                    <div class="timeline-description">New manager implemented comprehensive IT team restructuring, reorganizing from approximately 25 personnel to 13 core staff. Wei adapted to new organizational structure, management approach, and reporting relationships. Continued to maintain service quality and user satisfaction during significant transition.</div>
+                    <span class="impact-badge">✓ Change Adaptation</span>
+                </div>
+
+                <div class="timeline-item success">
+                    <div class="timeline-date">Present</div>
+                    <div class="timeline-title">Continuous Learning & Stability</div>
+                    <div class="timeline-description">MBA completion (2022-2025) with thesis focused on ITIL4 framework implementation. Completed leadership coaching from certified US coach. Implemented ITIL4 into daily IT operations. Maintains 95% user satisfaction and 75% 1-week ticket resolution rate through institutional changes and restructuring.</div>
+                    <span class="impact-badge">✓ Resilience</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- KEY ACHIEVEMENTS -->
+        <div class="section-title">
+            <span class="icon">🎯</span> Key Professional Achievements
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Technical & Strategic Accomplishments</h3>
+                <div class="achievement-item">
+                    <div class="achievement-title">Global ERP/CRM Implementation Leadership</div>
+                    <div class="achievement-desc">Led enterprise system implementations across Crown's international operations, demonstrating ability to align technology with complex business processes in manufacturing and retail sectors.</div>
+                </div>
+                <div class="achievement-item secondary">
+                    <div class="achievement-title">Large-Scale Infrastructure Management</div>
+                    <div class="achievement-desc">Built and maintained IT infrastructure supporting 1 manufacturing plant and 6 sales branches across China, including network infrastructure, data centers, servers, storage systems, and backup/recovery procedures.</div>
+                </div>
+                <div class="achievement-item accent">
+                    <div class="achievement-title">ITIL Framework Implementation (Versions 3 & 4)</div>
+                    <div class="achievement-desc">Implemented IT Service Management System based on ITIL best practices at Crown. Later introduced ITIL 4 framework at Duke Kunshan with formal workflows for Service Desk, Incident Management, Problem Management, and Asset Management. Made thesis focus during MBA studies.</div>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-title">Pandemic Operations Management</div>
+                    <div class="achievement-desc">Successfully navigated unprecedented shift to hybrid teaching environment. Engaged stakeholders, analyzed data, adjusted resource allocation. Maintained 95% user satisfaction during global crisis when many institutions experienced significant service degradation.</div>
+                </div>
+                <div class="achievement-item secondary">
+                    <div class="achievement-title">Supporting Institutional Growth</div>
+                    <div class="achievement-desc">Provided IT support as university grew significantly. Student enrollment increased from 1,100 (250 per cohort × 4) to 2,100 (500 per cohort × 4) plus graduate students. Supporting total community of 2,800+ including ~500 staff and ~200 faculty. Maintained service reliability and user satisfaction (95%) throughout Phase II expansion with additional facilities and increased user base.</div>
+                </div>
+                <div class="achievement-item accent">
+                    <div class="achievement-title">Adapting to Organizational Change</div>
+                    <div class="achievement-desc">Successfully adapted when new manager restructured IT team (from ~25 to 13 personnel). Continued to maintain service quality and promoted 2 managers within the new organizational structure.</div>
+                </div>
+                <div class="achievement-item secondary">
+                    <div class="achievement-title">Continuous Professional Development</div>
+                    <div class="achievement-desc">Earned PMP (2015) and ITIL (2016) certifications. Pursued MBA (2022-2025) while serving as Associate Director. Completed executive leadership coaching. Demonstrates commitment to staying current with industry best practices and developing as a leader.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- SKILLS EVOLUTION -->
+        <div class="section-title">
+            <span class="icon">🎓</span> Skills Evolution: Technical → Business → Leadership
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="skills-group">
+                    <h4>Technical Skills</h4>
+                    <div class="skill-item">
+                        <div class="skill-name">Infrastructure</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 95%;"></div></div>
+                        <div class="skill-level">Expert</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">ERP/CRM Systems</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 92%;"></div></div>
+                        <div class="skill-level">Expert</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Cybersecurity</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 85%;"></div></div>
+                        <div class="skill-level">Advanced</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">IT Service Mgmt</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 88%;"></div></div>
+                        <div class="skill-level">Expert</div>
+                    </div>
+                </div>
+
+                <div class="skills-group">
+                    <h4>Business Acumen</h4>
+                    <div class="skill-item">
+                        <div class="skill-name">IT-Business Alignment</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 90%;"></div></div>
+                        <div class="skill-level">Expert</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Manufacturing/Retail</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 88%;"></div></div>
+                        <div class="skill-level">Advanced</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Education Sector</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 82%;"></div></div>
+                        <div class="skill-level">Advanced</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Cross-Cultural Ops</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 85%;"></div></div>
+                        <div class="skill-level">Advanced</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="skills-group">
+                    <h4>Leadership Skills</h4>
+                    <div class="skill-item">
+                        <div class="skill-name">Team Management</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 88%;"></div></div>
+                        <div class="skill-level">Advanced</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Strategic Planning</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 85%;"></div></div>
+                        <div class="skill-level">Advanced</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Crisis Management</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 87%;"></div></div>
+                        <div class="skill-level">Advanced</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Emotional Intelligence</div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 80%;"></div></div>
+                        <div class="skill-level">Advanced</div>
+                    </div>
+                </div>
+
+                <div class="skills-group">
+                    <h4>Certifications & Learning</h4>
+                    <div class="achievement-item">
+                        <div class="achievement-title">✓ PMP (2015)</div>
+                        <div class="achievement-desc">Project Management Professional certification. Brings rigor to complex implementations.</div>
+                    </div>
+                    <div class="achievement-item secondary">
+                        <div class="achievement-title">✓ ITIL (2016)</div>
+                        <div class="achievement-desc">IT Service Management framework. Later pursued ITIL4 (MBA thesis topic).</div>
+                    </div>
+                    <div class="achievement-item accent">
+                        <div class="achievement-title">✓ MBA (2025)</div>
+                        <div class="achievement-desc">Business Administration, Suzhou University. Thesis on ITIL4 framework implementation.</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-title">✓ Leadership Coaching</div>
+                        <div class="achievement-desc">Certified coach from US. Transformed understanding of management vs. leadership.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- CORE THEMES -->
+        <div class="section-title">
+            <span class="icon">🔍</span> Core Competencies & Consistent Strengths
+        </div>
+
+        <div class="grid-3">
+            <div class="card highlight">
+                <h3>🌉 Business-Focused IT Leadership</h3>
+                <p>Bridges business and technology effectively. Understands organizational processes deeply (manufacturing, retail, education) and aligns IT solutions to business needs. Not a technician focused on technology for its own sake, but a strategist who asks "how does IT serve this organization."</p>
+                <p style="margin-top: 12px; font-size: 12px; color: var(--primary); font-weight: 600;">Evidence: ERP/CRM mastery at Crown, business systems leadership, faculty engagement at Duke, institutional support during growth phases.</p>
+            </div>
+
+            <div class="card highlight">
+                <h3>🏗️ Building Reliable Operations</h3>
+                <p>Delivers systems and services that don't fail. Infrastructure that runs reliably across manufacturing plants, retail branches, and educational institutions. Maintains high availability and user satisfaction even during institutional growth and crisis periods.</p>
+                <p style="margin-top: 12px; font-size: 12px; color: var(--secondary); font-weight: 600;">Evidence: 95% user satisfaction maintained through pandemic and Phase II expansion, 75% 1-week ticket resolution, global operations management.</p>
+            </div>
+
+            <div class="card highlight">
+                <h3>👥 Developing High-Performing Teams</h3>
+                <p>Builds capability within organizations by identifying talent and developing leaders. Promotes from within and coaches team members. Identified and promoted 2 managers within Duke team, demonstrating commitment to people development.</p>
+                <p style="margin-top: 12px; font-size: 12px; color: var(--accent); font-weight: 600;">Evidence: 2 managers promoted from team, team development within organizational structures.</p>
+            </div>
+
+            <div class="card highlight">
+                <h3>⚡ Managing Through Change & Crisis</h3>
+                <p>Navigates uncertainty and rapid change effectively. Doesn't avoid complexity; instead analyzes situations, engages stakeholders, makes decisions, and adapts. Pandemic response, institutional doubling, organizational restructuring all managed successfully while maintaining service quality.</p>
+                <p style="margin-top: 12px; font-size: 12px; color: var(--primary); font-weight: 600;">Evidence: Pandemic hybrid teaching response, supporting Phase II expansion, adapting to team restructuring.</p>
+            </div>
+
+            <div class="card highlight">
+                <h3>🌍 Global & Cross-Cultural Operations</h3>
+                <p>Comfortable operating across geographies, cultures, and organizational boundaries. Collaborates effectively with colleagues across continents. Bilingual English/Chinese. Manages in Chinese and international education contexts.</p>
+                <p style="margin-top: 12px; font-size: 12px; color: var(--secondary); font-weight: 600;">Evidence: 13 years global operations at Crown, annual US meetings, international student population support at Duke.</p>
+            </div>
+
+            <div class="card highlight">
+                <h3>📚 Strategic Learning & Development</h3>
+                <p>Stays current with industry trends and best practices. Pursues relevant certifications and formal education while maintaining operational responsibilities. Translates learning into organizational improvements (ITIL frameworks, processes, training).</p>
+                <p style="margin-top: 12px; font-size: 12px; color: var(--accent); font-weight: 600;">Evidence: PMP certification, ITIL certifications, MBA completion, ITIL4 implementation, leadership coaching.</p>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- VALUE PROPOSITION -->
+        <div class="section-title">
+            <span class="icon">⭐</span> Professional Value & Capabilities
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 16px;">As an IT Operations Leader, Wei Brings:</h3>
+            <p style="margin-bottom: 12px;"><strong>Operational Excellence:</strong> 95% user satisfaction, 75% 1-week ticket resolution. Delivers reliable services consistently. Designs systems and processes that scale with organizational growth.</p>
+            <p style="margin-bottom: 12px;"><strong>Strategic Alignment:</strong> Connects IT initiatives with organizational objectives. Understands business processes across manufacturing, retail, and education sectors. Makes technology decisions that serve institutional goals, not just technical ideals.</p>
+            <p style="margin-bottom: 12px;"><strong>Scalable Operations Management:</strong> Successfully managed growth from 250 → 500 students (2x enrollment increase). Restructured teams efficiently without degrading service quality. Can handle institutional expansion and complexity.</p>
+            <p style="margin-bottom: 12px;"><strong>People Leadership:</strong> Develops internal talent and promotes from within. Promoted 2 managers from team at Duke. Engages stakeholders effectively across hierarchies. Creates teams that execute reliably.</p>
+            <p style="margin-bottom: 12px;"><strong>Crisis & Change Management:</strong> Navigated pandemic transition to hybrid teaching without significant service degradation. Led team through institutional reorganization. Manages complexity and uncertainty with data-driven decisions and stakeholder engagement.</p>
+            <p><strong>Global Perspective:</strong> 13 years managing cross-border operations at Crown. Annual participation in global meetings. Bilingual. Comfortable in multicultural environments. Understands international operations.</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- SUMMARY -->
+        <div class="section-title">
+            <span class="icon">💡</span> Leadership Impact Summary
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 16px;">Supported Institutional Growth Across Career Stages:</h3>
+            <div class="achievement-item">
+                <div class="achievement-title">Built Reliable Global Operations</div>
+                <div class="achievement-desc">13 years at Crown managing IT across manufacturing and retail operations spanning multiple countries. Built infrastructure, implemented enterprise systems, and maintained reliable operations globally.</div>
+            </div>
+            <div class="achievement-item secondary">
+                <div class="achievement-title">Supported Institutional Growth Successfully</div>
+                <div class="achievement-desc">At Duke Kunshan, provided IT support for significant growth: 1,100 students (2019) → 2,100 students (2023). Supporting 2,800+ total community members including ~500 staff and ~200 faculty across expanded facilities. Maintained service quality and 95% user satisfaction throughout growth phase.</div>
+            </div>
+            <div class="achievement-item accent">
+                <div class="achievement-title">Navigated Crisis & Uncertainty</div>
+                <div class="achievement-desc">Successfully led IT through pandemic transition to hybrid teaching when no standard playbook existed. Engaged stakeholders, analyzed data, made decisions, executed without major service disruption.</div>
+            </div>
+            <div class="achievement-item">
+                <div class="achievement-title">Adapted to Organizational Change</div>
+                <div class="achievement-desc">Successfully adapted when new manager restructured IT operations and team design in 2025. Continued to maintain service quality, promoted 2 managers within new structure, and supported ongoing institutional needs for 2,800+ community.</div>
+            </div>
+            <div class="achievement-item secondary">
+                <div class="achievement-title">Invested in Continuous Development</div>
+                <div class="achievement-desc">Pursued PMP, ITIL, and MBA certifications while managing operations. Completed leadership coaching. Implemented learned frameworks and practices into organizational operations (ITIL4).</div>
+            </div>
+        </div>
+
+        <!-- CLOSING STATEMENT -->
+        <div style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 40px; border-radius: 12px; margin-top: 40px; text-align: center;">
+            <h2 style="font-size: 24px; margin-bottom: 12px;">A Reliable IT Operations Leader</h2>
+            <p style="font-size: 16px; line-height: 1.8; opacity: 0.95;">Wei demonstrates the capability to maintain and deliver IT operations reliably across complex, dynamic environments. With 20+ years of experience across manufacturing, retail, and education sectors, he has consistently delivered: 95% user satisfaction maintained through institutional growth and crisis periods, reliable global operations across multiple countries, strategic implementation of IT frameworks (ERP, CRM, ITIL), and commitment to developing team members into leadership roles.</p>
+            <p style="font-size: 16px; margin-top: 16px; opacity: 0.95;">His track record shows the ability to support organizations through significant change—pandemic adaptation, institutional growth, organizational restructuring—while maintaining service quality and continuing to develop high-performing teams.</p>
+            <p style="font-size: 14px; margin-top: 24px; opacity: 0.85; font-style: italic;">An operations leader who delivers reliability and consistency in complex environments.</p>
+        </div>
+
+        <div class="footer">
+            <p>Career Impact Dashboard | Generated August 6, 2026</p>
+            <p>This dashboard tells your real story: not just what you've done, but who you've become in the process.</p>
+        </div>
+    </div>
+</body>
+</html>
