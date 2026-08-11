@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>个人健康智能简报</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-size: 16px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+        .header .subtitle {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+        .header .date {
+            color: #999;
+            font-size: 0.85em;
+            display: block;
+            margin-bottom: 12px;
+        }
+        .verified-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }
+            .header {
+                padding: 40px;
+                margin-bottom: 30px;
+            }
+            .header h1 {
+                font-size: 2.5em;
+                margin-bottom: 10px;
+            }
+            .header .subtitle {
+                font-size: 1.1em;
+            }
+            body {
+                padding: 40px 20px;
+            }
+        }
+        @media (max-width: 500px) {
+            body {
+                padding: 15px;
+            }
+            .header {
+                padding: 15px;
+            }
+            .header h1 {
+                font-size: 1.5em;
+            }
+            .header .subtitle {
+                font-size: 0.9em;
+            }
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        @media (min-width: 768px) {
+            .section {
+                padding: 30px;
+            }
+        }
+        .section h2 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+        }
+        @media (min-width: 768px) {
+            .section h2 {
+                font-size: 1.5em;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+            }
+        }
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.05em;
+            margin-top: 15px;
+            margin-bottom: 12px;
+        }
+        @media (min-width: 768px) {
+            .section h3 {
+                font-size: 1.2em;
+                margin-top: 20px;
+                margin-bottom: 10px;
+            }
+        }
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95em;
+            gap: 10px;
+        }
+        @media (min-width: 768px) {
+            .metric-row {
+                padding: 12px 0;
+                font-size: 1em;
+            }
+        }
+        .metric-label {
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+            word-wrap: break-word;
+        }
+        .metric-value {
+            color: #667eea;
+            font-weight: 600;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .good { color: #10b981; }
+        .warning { color: #f59e0b; }
+        .critical { color: #ef4444; }
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin: 15px 0;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+                margin: 20px 0;
+            }
+        }
+        .action-item {
+            background: #f0f9ff;
+            padding: 12px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        @media (min-width: 768px) {
+            .action-item {
+                padding: 15px;
+                margin: 12px 0;
+                font-size: 1em;
+            }
+        }
+        .action-item.urgent {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }
+        .action-item.priority {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+        .action-item .action-no {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            margin-right: 8px;
+            font-size: 0.9em;
+        }
+        @media (min-width: 768px) {
+            .action-item .action-no {
+                width: 28px;
+                height: 28px;
+                line-height: 28px;
+                margin-right: 10px;
+                font-size: 1em;
+            }
+        }
+        .action-item.urgent .action-no { background: #ef4444; }
+        .action-item.priority .action-no { background: #f59e0b; }
+        .full-width { grid-column: 1 / -1; }
+        .footer {
+            text-align: center;
+            color: #999;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 0.85em;
+        }
+        @media (min-width: 768px) {
+            .footer {
+                margin-top: 40px;
+                padding-top: 20px;
+                font-size: 0.95em;
+            }
+        }
+        .insight-box {
+            padding: 15px;
+            background: #f0f9ff;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        @media (min-width: 768px) {
+            .insight-box {
+                padding: 20px;
+                margin-bottom: 20px;
+                font-size: 1em;
+            }
+        }
+        .insight-box strong { color: #1e40af; }
+        .verified-box {
+            padding: 15px;
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        @media (min-width: 768px) {
+            .verified-box {
+                padding: 20px;
+                margin-bottom: 20px;
+                font-size: 1em;
+            }
+        }
+        .verified-box strong { color: #065f46; }
+        ul {
+            margin-left: 15px;
+            line-height: 1.6;
+            font-size: 0.9em;
+        }
+        @media (min-width: 768px) {
+            ul {
+                margin-left: 20px;
+                line-height: 1.8;
+                font-size: 1em;
+            }
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+        .checklist {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+        @media (min-width: 768px) {
+            .checklist {
+                padding: 15px;
+                margin-top: 20px;
+                font-size: 0.95em;
+                line-height: 1.8;
+            }
+        }
+        .checklist div {
+            margin-bottom: 6px;
+        }
+        small {
+            display: block;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+        strong {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>个人健康智能简报</h1>
+            <p class="subtitle">H.pylori根治已验证 — 清理根治副作用</p>
+            <p class="date">更新日期: 2026年08月11日</p>
+            <span class="verified-badge">✓ H.pylori已根治</span>
+        </div>
+
+        <div class="grid">
+            <!-- 关键发现 -->
+            <div class="section full-width">
+                <h2>0. 关键发现</h2>
+
+                <div class="verified-box">
+                    <strong>2026年6月26日C13呼气试验：阴性</strong><br/>
+                    <small>H.pylori完全根治。现在处理根治的副作用。</small>
+                </div>
+
+                <h3>你的故事</h3>
+                <ul>
+                    <li><strong>2020-2021年：</strong>H.pylori感染导致代谢快速恶化</li>
+                    <li><strong>2025年：</strong>根治，ALT改善(131.8→80)</li>
+                    <li><strong>2026年：</strong>感染已清除，现在处理副作用</li>
+                </ul>
+            </div>
+
+            <!-- 现在的情况 -->
+            <div class="section full-width">
+                <h2>1. 当前健康状况</h2>
+
+                <h3>已解决的</h3>
+                <div class="metric-row">
+                    <span class="metric-label">H.pylori感染</span>
+                    <span class="metric-value good">✓ 已清除</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">肝功能</span>
+                    <span class="metric-value good">✓ 改善</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">血糖</span>
+                    <span class="metric-value good">✓ 正常</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">肾功能</span>
+                    <span class="metric-value good">✓ 正常</span>
+                </div>
+
+                <h3>需要处理的</h3>
+                <div class="metric-row">
+                    <span class="metric-label">铁蛋白</span>
+                    <span class="metric-value critical">696.92(高)</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">原因</span>
+                    <span class="metric-value warning">PPI副作用</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">解决</span>
+                    <span class="metric-value good">停止PPI</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">血压</span>
+                    <span class="metric-value warning">148/89 mmHg</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">原因</span>
+                    <span class="metric-value warning">感染后遗症+缺镁</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">解决</span>
+                    <span class="metric-value good">补充微量元素</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">微量元素</span>
+                    <span class="metric-value critical">未知(可能缺)</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">原因</span>
+                    <span class="metric-value warning">5年H.pylori+PPI</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">解决</span>
+                    <span class="metric-value good">检查+补充</span>
+                </div>
+            </div>
+
+            <!-- 行动计划 -->
+            <div class="section full-width">
+                <h2>2. 接下来14天的行动</h2>
+
+                <div class="action-item urgent">
+                    <span class="action-no">1</span>
+                    <strong>今天：确认PPI用药状态</strong>
+                    <small>打电话给消化科医生，问是否仍在吃质子泵抑制剂。这是导致铁蛋白升高的原因，必须立即停止或减量。</small>
+                </div>
+
+                <div class="action-item urgent">
+                    <span class="action-no">2</span>
+                    <strong>第1-3天：检查微量元素</strong>
+                    <small>验血：B12、镁、维生素D、铁饱和度。费用¥200-400，3-5天出结果。5年H.pylori+PPI必然导致缺陷。</small>
+                </div>
+
+                <div class="action-item priority">
+                    <span class="action-no">3</span>
+                    <strong>第2-4天：开始补充微量元素</strong>
+                    <small>不用等医生。购买：B12(1000-2000 mcg/天)、镁(400-500 mg/天)、维生素D(2000 IU/天)。1-2周内能量改善。</small>
+                </div>
+
+                <div class="action-item priority">
+                    <span class="action-no">4</span>
+                    <strong>第5-7天：买家用血压计</strong>
+                    <small>早晚各测一次。诊所的148可能包含"白衣高血压"。补充镁后，血压应在2-4周内开始下降。</small>
+                </div>
+
+                <div class="action-item">
+                    <span class="action-no">5</span>
+                    <strong>第2周：心内科预约</strong>
+                    <small>告诉医生H.pylori已根治，要求3个月观察期评估血压是否会自动改善，而不是立即吃药。</small>
+                </div>
+            </div>
+
+            <!-- 14天清单 -->
+            <div class="section full-width">
+                <h2>3. 14天完成清单</h2>
+                <div class="checklist">
+                    <div>☐ 确认PPI用药状态</div>
+                    <div>☐ 下达微量元素检查血单</div>
+                    <div>☐ 购买B12、镁、D补充</div>
+                    <div>☐ 购买家用血压计</div>
+                    <div>☐ 血液检查结果回来</div>
+                    <div>☐ 预约心内科</div>
+                    <div>☐ 开始散步(30分×5次/周)</div>
+                    <div>☐ 开始低盐饮食</div>
+                </div>
+            </div>
+
+            <!-- 3个月展望 -->
+            <div class="section full-width">
+                <h2>4. 未来3个月的预期</h2>
+
+                <h3>如果你执行这个计划：</h3>
+                <ul>
+                    <li><strong>2-4周：</strong>能量改善(B12补充)</li>
+                    <li><strong>4-6周：</strong>血压开始下降(停止PPI+镁)</li>
+                    <li><strong>2-3个月：</strong>铁蛋白下降，血压可能<135/85</li>
+                    <li><strong>3个月后：</strong>可能根本不需要吃降压药</li>
+                </ul>
+
+                <h3>第12周重新检查：</h3>
+                <ul>
+                    <li>血压</li>
+                    <li>血脂</li>
+                    <li>铁蛋白和铁饱和度</li>
+                    <li>微量元素</li>
+                    <li>体重</li>
+                    <li>肝功能</li>
+                </ul>
+            </div>
+
+            <!-- 最关键的3点 -->
+            <div class="section full-width">
+                <h2>5. 最关键的3个要点</h2>
+
+                <div class="verified-box">
+                    <strong>1. H.pylori已根治——一战已赢</strong>
+                    <small>C13呼气试验确认。现在的问题是清理战场。</small>
+                </div>
+
+                <div style="background: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; border-radius: 4px; margin: 15px 0;">
+                    <strong style="color: #92400e;">2. 停止PPI是第一优先级</strong>
+                    <small>不是吃降压药。停止PPI，2-3个月后铁蛋白和血压都会改善。</small>
+                </div>
+
+                <div style="background: #fef2f2; padding: 15px; border-left: 4px solid #ef4444; border-radius: 4px; margin: 15px 0;">
+                    <strong style="color: #991b1b;">3. 微量元素缺陷是血压高的真正原因</strong>
+                    <small>补充B12和镁可能比吃降压药更有效。这是最被忽视的。</small>
+                </div>
+            </div>
+
+            <!-- 总结 -->
+            <div class="section full-width">
+                <h2>总结</h2>
+                <p style="color: #333; line-height: 1.6; margin-bottom: 15px;">你在处理"已知感染的恢复期副作用"，不是"未来的慢性病"。这改变一切。</p>
+                <ul>
+                    <li>代谢崩溃？ H.pylori导致，已根治</li>
+                    <li>血压升高？ 感染后遗症，可改善</li>
+                    <li>铁过量？ PPI副作用，停药会下降</li>
+                    <li>需要长期吃药？ 可能不需要，先试3个月</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>基于2026年6月26日完整体检数据。请与医疗提供者分享此报告。</p>
+        </div>
+    </div>
+</body>
+</html>
